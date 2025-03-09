@@ -7,15 +7,14 @@ interface UserStore {
 }
 
 export const useUserStore = create<UserStore>((set) => {
-  let storedUserId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
-
-  if (!storedUserId) {
-    storedUserId = uuidv4();
-    if (typeof window !== "undefined") {
+  let storedUserId = "";
+  if (typeof window !== "undefined") {
+    storedUserId = localStorage.getItem("userId") || "";
+    if (!storedUserId) {
+      storedUserId = uuidv4();
       localStorage.setItem("userId", storedUserId);
     }
   }
-
   return {
     userId: storedUserId,
     setUserId: (id: string) => {
