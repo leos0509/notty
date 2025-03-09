@@ -1,3 +1,4 @@
+"use client"
 import { useTaskStore } from "@/store/useTaskStore";
 import { useEffect, useState } from "react";
 import TaskCard from "./TaskCard";
@@ -7,6 +8,8 @@ const TaskList = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const uid = localStorage.getItem("userId");
+    console.log("Current userId:", uid);
     const loadTasks = async () => {
       await fetchTask();
       setLoading(false);
