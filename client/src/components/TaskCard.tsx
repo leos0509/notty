@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ChevronDown, Pin, PinOff, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
-import { Task, TaskStatus, useTaskStore } from "@/store/useTaskStore";
+import { Task, useTaskStore } from "@/store/useTaskStore";
 import { useUpdateTaskModalStore } from "@/store/useUpdateTaskModalStore";
 
 type TaskCardProps = {

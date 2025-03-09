@@ -2,7 +2,7 @@
 import { Task, TaskStatus, useTaskStore } from "@/store/useTaskStore";
 import { useUpdateTaskModalStore } from "@/store/useUpdateTaskModalStore";
 import { X } from "lucide-react";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type UpdateTaskModalProps = {
   task: Task | null;
