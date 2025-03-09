@@ -1,19 +1,21 @@
 import express from "express";
 import {
   addTask,
-  getTask,
+  getTasks,
   updateTaskChecked,
   updateTaskPinned,
   deleteTask,
   updateTask,
+  getTask,
 } from "../controllers/taskController";
 
 const router = express.Router();
 
 router.post("/", addTask);
-router.get("/", getTask);
-router.put("/checked/:id", updateTaskChecked);
-router.put("/pinned/:id", updateTaskPinned);
+router.get("/", getTasks);
+router.get("/:id", getTask);
+router.patch("/checked/:id", updateTaskChecked);
+router.patch("/pinned/:id", updateTaskPinned);
 router.put("/:id", updateTask);
 router.delete("/:id", deleteTask);
 
