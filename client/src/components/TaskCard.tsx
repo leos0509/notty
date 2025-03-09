@@ -1,65 +1,39 @@
-import React, { useEffect, useState } from "react";
-import { ChevronDown, Pin, PinOff, Pencil, Trash2, Dot } from "lucide-react";
-import { Task, useTaskContext } from "./TaskContext";
-import { useTaskModalContext } from "./TaskModal";
+import React, { useState } from "react";
+import { ChevronDown, Pin, PinOff, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
+import { Task, TaskStatus, useTaskStore } from "@/store/useTaskStore";
+import { useUpdateTaskModalStore } from "@/store/useUpdateTaskModalStore";
 
 type TaskCardProps = {
   task: Task;
 };
 
 const TaskCard = ({ task }: TaskCardProps) => {
-  const { toggleChecked, togglePinned, deleteTask } = useTaskContext();
   const [isOpen, setIsOpen] = useState(false);
-  const {
-    isOpen: isOpenModal,
-    setIsOpen: setIsOpenModal,
-    setTask,
-  } = useTaskModalContext();
-  const id = task.id;
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("pending");
-  const [dueDate, setDueDate] = useState("");
-  const [isPinned, setIsPinned] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
-
-  useEffect(() => {
-    if (task) {
-      setTitle(task.title || "");
-      setDescription(task.description || "");
-      setStatus(task.status || "pending");
-      setDueDate(task.dueDate || "");
-      setIsPinned(task.isPinned || false);
-      setIsChecked(task.isChecked || false);
-    }
-  }, [task]);
+  const { id, title, description, dueDate, status, isPinned, isChecked } = task;
+  const { openModal } = useUpdateTaskModalStore();
+  const { removeTask, toggleCheck, togglePin } = useTaskStore();
 
   const formattedDate = dueDate ? format(new Date(dueDate), "MM/dd/yyyy") : "";
 
-  const handleCheckChange = (isChecked: boolean) => {
-    setIsChecked(isChecked);
-    toggleChecked(id);
-  };
-
   const handlePinChange = () => {
-    setIsPinned(isPinned);
-    togglePinned(id);
-  };
-
-  const hanldeUpdateTask = () => {
-    setIsOpenModal(!isOpenModal);
-    if (setTask) {
-      setTask({ id, title, description, dueDate, status, isPinned, isChecked });
+    if (id) {
+      togglePin(id);
     }
-  };
+  }
+
+  const handleCheckChange = () => {
+    if (id) {
+      toggleCheck(id);
+    }
+  }
 
   return (
     <div className="relative flex w-full flex-col rounded-lg border border-gray-300 bg-white shadow-sm">
       <input
         type="checkbox"
         checked={isChecked}
-        onChange={(e) => handleCheckChange(e.target.checked)}
+        onChange={handleCheckChange}
         className="absolute top-1/2 -left-8 h-4 w-4 flex-shrink-0 -translate-y-1/2 transform cursor-pointer"
       />
       <div
@@ -78,8 +52,11 @@ const TaskCard = ({ task }: TaskCardProps) => {
               <p className="text-sm text-gray-500 italic">{formattedDate}</p>
             )}
             <div className="size-1 flex-shrink-0 rounded-full bg-gray-400"></div>
-            <p className={`text-sm ${status === "completed" ? "text-green-500" : status === "in_progress" ? "text-blue-500" : "text-red-500"}`}>
-                {status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, " ")}
+            <p
+              // className={`text-sm ${status === "completed" ? "text-green-500" : status === "in_progress" ? "text-blue-500" : "text-red-500"}`}
+            >
+              {status && status.charAt(0).toUpperCase() +
+                status.slice(1).replace(/_/g, " ")}
             </p>
           </div>
         </div>
@@ -89,21 +66,21 @@ const TaskCard = ({ task }: TaskCardProps) => {
             <button
               aria-label="Pin task"
               className="transition-all duration-100 ease-in-out hover:cursor-pointer hover:text-amber-500"
-              onClick={handlePinChange}
+                onClick={handlePinChange}
             >
               {isPinned ? <PinOff size={20} /> : <Pin size={20} />}
             </button>
             <button
               aria-label="Edit task"
               className="transition-all duration-100 ease-in-out hover:cursor-pointer hover:text-blue-500"
-              onClick={hanldeUpdateTask}
+                onClick={() => openModal(task)}
             >
               <Pencil size={20} />
             </button>
             <button
               aria-label="Delete task"
               className="transition-all duration-100 ease-in-out hover:cursor-pointer hover:text-red-500"
-              onClick={() => deleteTask(id)}
+              onClick={id ? () => removeTask(id) : () => {}}
             >
               <Trash2 size={20} />
             </button>

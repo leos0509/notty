@@ -1,13 +1,36 @@
+"use client";
 import { Task, TaskStatus, useTaskStore } from "@/store/useTaskStore";
-import React, { useState } from "react";
+import { useUpdateTaskModalStore } from "@/store/useUpdateTaskModalStore";
+import { X } from "lucide-react";
+import React, { use, useEffect, useState } from "react";
 
-const TaskModal = () => {
+type UpdateTaskModalProps = {
+  task: Task | null;
+};
+
+const UpdateTaskModal = ({ task }: UpdateTaskModalProps) => {
+  const [id, setId] = useState<number>();
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<TaskStatus>(TaskStatus.IN_PROGRESS);
-  const { addTask } = useTaskStore();
-  
+  const [isChecked, setIsChecked] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
+  const { closeModal } = useUpdateTaskModalStore();
+  const { updateTask } = useTaskStore();
+
+  useEffect(() => {
+    if (task) {
+      setId(task.id);
+      setTitle(task.title);
+      setDueDate(task.dueDate);
+      setDescription(task.description || "");
+      setStatus(task.status || TaskStatus.IN_PROGRESS);
+      setIsChecked(task.isChecked);
+      setIsPinned(task.isPinned);
+    }
+  }, [task]);
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!title || !dueDate) {
@@ -27,29 +50,39 @@ const TaskModal = () => {
       return;
     }
 
-    const newTask: Task = {
+    const formattedDueDate = new Date(dueDate).toISOString();
+
+    const updatedTask: Task = {
+      id,
       title,
-      dueDate,
+      dueDate: formattedDueDate,
       description,
-      status: TaskStatus.IN_PROGRESS,
-      isPinned: false,
-      isChecked: false,
+      status,
+      isPinned,
+      isChecked,
     };
-    addTask(newTask);
+
+    if (id) {
+      updateTask(id, updatedTask);
+    }
     setTitle("");
     setDueDate("");
     setDescription("");
     setStatus(TaskStatus.IN_PROGRESS);
+    setIsChecked(false);
+    setIsPinned(false);
   };
 
   return (
-    <div className="flex w-full flex-col gap-2">
-      <h1 className="text-lg font-bold">Create your task</h1>
+    <div
+      className={`flex w-full flex-col gap-2 rounded-lg bg-white p-8 shadow relative`}
+    >
+      <h1 className="text-lg font-bold">Update Task</h1>
       <form
         onSubmit={handleSubmit}
-        className="flex w-full justify-between gap-4"
+        className="flex w-full flex-col justify-between gap-4"
       >
-        <div className="flex w-full flex-col gap-2">
+        <div className="flex w-full flex-col gap-4">
           <div className="flex w-full flex-wrap items-center gap-2 md:flex-nowrap">
             <label htmlFor="" className="font-semibold">
               Title:
@@ -69,7 +102,7 @@ const TaskModal = () => {
               </label>
               <input
                 type="date"
-                value={dueDate}
+                value={dueDate.split("T")[0]}
                 onChange={(e) => setDueDate(e.target.value)}
                 className="w-full min-w-48 rounded-md bg-gray-100 p-2 transition-all duration-100 ease-in-out hover:bg-gray-200 focus:ring-1 focus:ring-gray-500 focus:outline-none"
               />
@@ -99,21 +132,45 @@ const TaskModal = () => {
               placeholder="Type something"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="min-h-24 w-full rounded-md bg-gray-100 p-2 transition-all duration-100 ease-in-out hover:bg-gray-200 focus:ring-1 focus:ring-gray-500 focus:outline-none"
+              className="min-h-48 w-full rounded-md bg-gray-100 p-2 transition-all duration-100 ease-in-out hover:bg-gray-200 focus:ring-1 focus:ring-gray-500 focus:outline-none"
             />
           </div>
         </div>
-        <div className="flex-shrink-0">
+        <div className="flex flex-shrink-0 justify-end">
           <button
-            className="h-full w-32 rounded-md bg-gray-800 px-4 py-2 font-mono text-lg text-white uppercase hover:cursor-pointer hover:bg-gray-700"
+            className="h-full  rounded-md bg-gray-800 px-4 py-2 font-mono text-lg text-white uppercase hover:cursor-pointer hover:bg-gray-700"
             type="submit"
+            onClick={closeModal}
           >
-            add task
+            update task
           </button>
         </div>
       </form>
+      <button className="absolute top-4 right-4 p-2 rounded-full cursor-pointer hover:bg-gray-400 bg-gray-200" onClick={closeModal}>
+          <X size={16} />
+        </button>
     </div>
   );
 };
 
-export default TaskModal;
+const UpdateTaskModalProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  const { updatedTask, closeModal, isOpen } = useUpdateTaskModalStore();
+  
+  return (
+    <div className="relative w-full">
+      {children}
+      <div
+        className={`absolute top-1/2 left-1/2 flex h-full w-screen -translate-x-1/2 -translate-y-1/2 items-center bg-gray-900/50 px-8 lg:px-32 xl:px-64 ${isOpen ? "" : "hidden"}`}
+        onClick={(e) => e.target === e.currentTarget && closeModal()}
+      >
+        <UpdateTaskModal task={updatedTask} />
+      </div>
+    </div>
+  );
+};
+
+export default UpdateTaskModalProvider;
