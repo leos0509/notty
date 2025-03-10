@@ -8,15 +8,16 @@ import {
   updateTask,
   getTask,
 } from "../controllers/taskController";
+import { authenticate } from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
-router.post("/", addTask);
-router.get("/", getTasks);
-router.get("/:id", getTask);
-router.patch("/checked/:id", updateTaskChecked);
-router.patch("/pinned/:id", updateTaskPinned);
-router.put("/:id", updateTask);
-router.delete("/:id", deleteTask);
+router.post("/", authenticate, addTask);
+router.get("/", authenticate, getTasks);
+router.get("/:id", authenticate, getTask);
+router.patch("/checked/:id", authenticate, updateTaskChecked);
+router.patch("/pinned/:id", authenticate, updateTaskPinned);
+router.put("/:id", authenticate, updateTask);
+router.delete("/:id", authenticate, deleteTask);
 
 export default router;

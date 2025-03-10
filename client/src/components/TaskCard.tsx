@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ChevronDown, Pin, PinOff, Pencil, Trash2 } from "lucide-react";
 import { format } from "date-fns";
-import { Task, useTaskStore } from "@/store/useTaskStore";
+import { Task, TaskStatus, useTaskStore } from "@/store/useTaskStore";
 import { useUpdateTaskModalStore } from "@/store/useUpdateTaskModalStore";
 
 type TaskCardProps = {
@@ -20,13 +20,19 @@ const TaskCard = ({ task }: TaskCardProps) => {
     if (id) {
       togglePin(id);
     }
-  }
+  };
 
   const handleCheckChange = () => {
     if (id) {
       toggleCheck(id);
     }
-  }
+  };
+
+  const handleRemoveTask = () => {
+    if (id) {
+      removeTask(id);
+    }
+  };
 
   return (
     <div className="relative flex w-full flex-col rounded-lg border border-gray-300 bg-white shadow-sm">
@@ -52,12 +58,7 @@ const TaskCard = ({ task }: TaskCardProps) => {
               <p className="text-sm text-gray-500 italic">{formattedDate}</p>
             )}
             <div className="size-1 flex-shrink-0 rounded-full bg-gray-400"></div>
-            <p
-              // className={`text-sm ${status === "completed" ? "text-green-500" : status === "in_progress" ? "text-blue-500" : "text-red-500"}`}
-            >
-              {status && status.charAt(0).toUpperCase() +
-                status.slice(1).replace(/_/g, " ")}
-            </p>
+            <p>{TaskStatus[status as keyof typeof TaskStatus]}</p>
           </div>
         </div>
 
@@ -66,21 +67,21 @@ const TaskCard = ({ task }: TaskCardProps) => {
             <button
               aria-label="Pin task"
               className="transition-all duration-100 ease-in-out hover:cursor-pointer hover:text-amber-500"
-                onClick={handlePinChange}
+              onClick={handlePinChange}
             >
               {isPinned ? <PinOff size={20} /> : <Pin size={20} />}
             </button>
             <button
               aria-label="Edit task"
               className="transition-all duration-100 ease-in-out hover:cursor-pointer hover:text-blue-500"
-                onClick={() => openModal(task)}
+              onClick={() => openModal(task)}
             >
               <Pencil size={20} />
             </button>
             <button
               aria-label="Delete task"
               className="transition-all duration-100 ease-in-out hover:cursor-pointer hover:text-red-500"
-              onClick={id ? () => removeTask(id) : () => {}}
+              onClick={handleRemoveTask}
             >
               <Trash2 size={20} />
             </button>

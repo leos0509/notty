@@ -7,6 +7,7 @@ import bodyParser from "body-parser";
 
 /* ROUTES IMPORT */
 import taskRoutes from "./routes/taskRoutes";
+import authRoutes from "./routes/authRoutes";
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -25,6 +26,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/tasks", taskRoutes);
+app.use("/api/auth", authRoutes)
 
 app.listen(process.env.PORT || 8080, () => {
   console.log(`Server is running on http://localhost:${process.env.PORT}`);

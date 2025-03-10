@@ -7,11 +7,17 @@ export enum TaskStatus {
   DONE = "Done",
 }
 
+export enum MappedTaskStatus {
+  "To do" = "TODO",
+  "In progress" = "IN_PROGRESS",
+  "Done" = "DONE",
+}
+
 export interface Task {
   id?: number;
   title: string;
   dueDate: string;
-  status?: TaskStatus | null;
+  status?: MappedTaskStatus | null;
   description?: string;
   isPinned: boolean | false;
   isChecked: boolean | false;
@@ -32,18 +38,13 @@ export interface TaskStore {
 export const useTaskStore = create<TaskStore>((set) => ({
   tasks: [],
   fetchTask: async () => {
-    const userId = localStorage.getItem("userId");
-
-    if (!userId) {
-      console.error("User ID not found in localStorage.");
-      return;
-    }
-
     try {
       const res = await axios({
         method: "GET",
         url: `${process.env.NEXT_PUBLIC_API_BASE_URL}tasks`,
-        headers: { userId },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
       const tasks = await res.data;
       set({ tasks });
@@ -52,22 +53,14 @@ export const useTaskStore = create<TaskStore>((set) => ({
     }
   },
   addTask: async (task) => {
-    const userId = localStorage.getItem("userId");
-
-    console.log("userId", userId);
-    console.log("task", task);
-
-    if (!userId) {
-      console.error("User ID not found in localStorage.");
-      return;
-    }
-
     try {
       await axios({
         method: "POST",
         url: `${process.env.NEXT_PUBLIC_API_BASE_URL}tasks`,
-        headers: { userId },
         data: task,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
       set((state) => ({ tasks: [...state.tasks, task] }));
     } catch (error) {
@@ -75,18 +68,13 @@ export const useTaskStore = create<TaskStore>((set) => ({
     }
   },
   removeTask: async (id) => {
-    const userId = localStorage.getItem("userId");
-
-    if (!userId) {
-      console.error("User ID not found in localStorage.");
-      return;
-    }
-
     try {
       await axios({
         method: "DELETE",
         url: `${process.env.NEXT_PUBLIC_API_BASE_URL}tasks/${id}`,
-        headers: { userId },  // Add userId in headers
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
       set((state) => ({
         tasks: state.tasks.filter((task) => task.id !== id),
@@ -96,22 +84,17 @@ export const useTaskStore = create<TaskStore>((set) => ({
     }
   },
   togglePin: async (id) => {
-    const userId = localStorage.getItem("userId");
-
-    if (!userId) {
-      console.error("User ID not found in localStorage.");
-      return;
-    }
-
     try {
       await axios({
         method: "PATCH",
         url: `${process.env.NEXT_PUBLIC_API_BASE_URL}tasks/pinned/${id}`,
-        headers: { userId },  // Add userId in headers
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
       set((state) => ({
         tasks: state.tasks.map((task) =>
-          task.id === id ? { ...task, isPinned: !task.isPinned } : task
+          task.id === id ? { ...task, isPinned: !task.isPinned } : task,
         ),
       }));
     } catch (error) {
@@ -119,22 +102,17 @@ export const useTaskStore = create<TaskStore>((set) => ({
     }
   },
   toggleCheck: async (id) => {
-    const userId = localStorage.getItem("userId");
-
-    if (!userId) {
-      console.error("User ID not found in localStorage.");
-      return;
-    }
-
     try {
       await axios({
         method: "PATCH",
         url: `${process.env.NEXT_PUBLIC_API_BASE_URL}tasks/checked/${id}`,
-        headers: { userId },  // Add userId in headers
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
       set((state) => ({
         tasks: state.tasks.map((task) =>
-          task.id === id ? { ...task, isChecked: !task.isChecked } : task
+          task.id === id ? { ...task, isChecked: !task.isChecked } : task,
         ),
       }));
     } catch (error) {
@@ -142,22 +120,17 @@ export const useTaskStore = create<TaskStore>((set) => ({
     }
   },
   updateTask: async (id, task) => {
-    const userId = localStorage.getItem("userId");
-
-    if (!userId) {
-      console.error("User ID not found in localStorage.");
-      return;
-    }
-
     try {
       await axios({
         method: "PUT",
         url: `${process.env.NEXT_PUBLIC_API_BASE_URL}tasks/${id}`,
-        headers: { userId },  // Add userId in headers
         data: task,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
       set((state) => ({
-        tasks: state.tasks.map((t) => (t.id === id ? task : t)),
+        tasks: state.tasks.map((t) => (t.id === id ? { ...t, ...task } : t)),
       }));
     } catch (error) {
       console.error("Failed to update task:", error);

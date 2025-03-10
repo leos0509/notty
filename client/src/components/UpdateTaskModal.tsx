@@ -1,5 +1,10 @@
 "use client";
-import { Task, TaskStatus, useTaskStore } from "@/store/useTaskStore";
+import {
+  MappedTaskStatus,
+  Task,
+  TaskStatus,
+  useTaskStore,
+} from "@/store/useTaskStore";
 import { useUpdateTaskModalStore } from "@/store/useUpdateTaskModalStore";
 import { X } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -13,7 +18,9 @@ const UpdateTaskModal = ({ task }: UpdateTaskModalProps) => {
   const [title, setTitle] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState<TaskStatus>(TaskStatus.IN_PROGRESS);
+  const [mappedStatus, setMappedStatus] = useState<MappedTaskStatus>(
+    MappedTaskStatus["In progress"],
+  );
   const [isChecked, setIsChecked] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
   const { closeModal } = useUpdateTaskModalStore();
@@ -25,7 +32,7 @@ const UpdateTaskModal = ({ task }: UpdateTaskModalProps) => {
       setTitle(task.title);
       setDueDate(task.dueDate);
       setDescription(task.description || "");
-      setStatus(task.status || TaskStatus.IN_PROGRESS);
+      setMappedStatus(task.status || MappedTaskStatus["In progress"]);
       setIsChecked(task.isChecked);
       setIsPinned(task.isPinned);
     }
@@ -57,7 +64,7 @@ const UpdateTaskModal = ({ task }: UpdateTaskModalProps) => {
       title,
       dueDate: formattedDueDate,
       description,
-      status,
+      status: mappedStatus,
       isPinned,
       isChecked,
     };
@@ -68,14 +75,14 @@ const UpdateTaskModal = ({ task }: UpdateTaskModalProps) => {
     setTitle("");
     setDueDate("");
     setDescription("");
-    setStatus(TaskStatus.IN_PROGRESS);
+    setMappedStatus(MappedTaskStatus["In progress"]);
     setIsChecked(false);
     setIsPinned(false);
   };
 
   return (
     <div
-      className={`flex w-full flex-col gap-2 rounded-lg bg-white p-8 shadow relative`}
+      className={`relative flex w-full flex-col gap-2 rounded-lg bg-white p-8 shadow`}
     >
       <h1 className="text-lg font-bold">Update Task</h1>
       <form
@@ -113,12 +120,12 @@ const UpdateTaskModal = ({ task }: UpdateTaskModalProps) => {
               </label>
               <select
                 className="w-full min-w-48 rounded-md bg-gray-100 p-2 transition-all duration-100 ease-in-out hover:bg-gray-200 focus:ring-1 focus:ring-gray-500 focus:outline-none"
-                value={status}
-                onChange={(e) => setStatus(e.target.value as TaskStatus)}
+                value={mappedStatus}
+                onChange={(e) => setMappedStatus(e.target.value as MappedTaskStatus)}
               >
-                {Object.values(TaskStatus).map((status) => (
+                {Object.values(MappedTaskStatus).map((status) => (
                   <option key={status} value={status}>
-                    {status}
+                    {TaskStatus[status]}
                   </option>
                 ))}
               </select>
@@ -138,7 +145,7 @@ const UpdateTaskModal = ({ task }: UpdateTaskModalProps) => {
         </div>
         <div className="flex flex-shrink-0 justify-end">
           <button
-            className="h-full  rounded-md bg-gray-800 px-4 py-2 font-mono text-lg text-white uppercase hover:cursor-pointer hover:bg-gray-700"
+            className="h-full rounded-md bg-gray-800 px-4 py-2 font-mono text-lg text-white uppercase hover:cursor-pointer hover:bg-gray-700"
             type="submit"
             onClick={closeModal}
           >
@@ -146,9 +153,12 @@ const UpdateTaskModal = ({ task }: UpdateTaskModalProps) => {
           </button>
         </div>
       </form>
-      <button className="absolute top-4 right-4 p-2 rounded-full cursor-pointer hover:bg-gray-400 bg-gray-200" onClick={closeModal}>
-          <X size={16} />
-        </button>
+      <button
+        className="absolute top-4 right-4 cursor-pointer rounded-full bg-gray-200 p-2 hover:bg-gray-400"
+        onClick={closeModal}
+      >
+        <X size={16} />
+      </button>
     </div>
   );
 };
@@ -159,9 +169,9 @@ const UpdateTaskModalProvider = ({
   children: React.ReactNode;
 }) => {
   const { updatedTask, closeModal, isOpen } = useUpdateTaskModalStore();
-  
+
   return (
-    <div className="relative w-full">
+    <div className="relative flex w-full items-center justify-center">
       {children}
       <div
         className={`absolute top-1/2 left-1/2 flex h-full w-screen -translate-x-1/2 -translate-y-1/2 items-center bg-gray-900/50 px-8 lg:px-32 xl:px-64 ${isOpen ? "" : "hidden"}`}

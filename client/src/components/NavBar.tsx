@@ -1,15 +1,25 @@
 "use client";
-import Image from "next/image";
+import useUserStore from "@/store/userStore";
+import { User } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 
 const NavBar = () => {
   const router = useRouter();
+  const [isOpenUser, setIsOpenUser] = useState(false);
+  const { user, signout } = useUserStore();
+
+  const handleSignout = async () => {
+    router.push("/signin");
+    signout();
+    setIsOpenUser(false);
+  };
+
   return (
-    <div className="sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b border-b-gray-200 bg-white px-8 py-8">
+    <div className="absolute top-0 z-50 flex h-16 w-full items-center justify-between border-b border-b-gray-200 bg-white px-8 py-8">
       <div className="flex items-center gap-4">
         <button
-          className="cursor-pointer font-mono text-2xl font-bold uppercase hover:opacity-80 relative"
+          className="relative cursor-pointer font-mono text-2xl font-bold uppercase hover:opacity-80"
           onClick={() => router.push("/")}
         >
           NOTTY
@@ -39,16 +49,28 @@ const NavBar = () => {
           </button>
         </div>
       </div>
-      <div className="flex items-center gap-6">
-        <button className="rounded-md hover:opacity-80 text-sm capitalize hover:cursor-pointer" onClick={() => window.location.href = process.env.NEXT_PUBLIC_OWNER_GITHUB_URL || ""}>
-          <Image src="/github.svg" alt="github-icon" width={24} height={24}/>
-        </button>
-        <button className="rounded-md hover:opacity-80 text-sm capitalize hover:cursor-pointer" onClick={() => window.location.href = process.env.NEXT_PUBLIC_OWNER_LINKEDIN_URL || ""}>
-          <Image src="/linkedin.svg" alt="linkedin-icon" width={24} height={24}/>
-        </button>
-        <button className="rounded-md hover:opacity-80 text-sm capitalize hover:cursor-pointer" onClick={() => window.location.href = `mailto:${process.env.NEXT_PUBLIC_OWNER_EMAIL || ""}`}>
-          <Image src="/gmail.svg" alt="gmail-icon" width={24} height={24}/>
-        </button>
+      <div className="relative flex items-center gap-6">
+        {user && (
+          <>
+            <div
+              className={`flex cursor-pointer items-center justify-center gap-2 rounded-full p-2 px-4 hover:bg-gray-200 ${isOpenUser ? "bg-gray-300" : "bg-gray-100"}`}
+              onClick={() => setIsOpenUser(!isOpenUser)}
+            >
+              <User size={24} />
+              <p>{user?.name}</p>
+            </div>
+            <div
+              className={`absolute -bottom-12 left-1/2 -translate-x-1/2 rounded-md bg-gray-100 p-2 shadow ${isOpenUser ? "block" : "hidden"}`}
+            >
+              <button
+                className="px-4 text-nowrap hover:font-semibold hover:underline hover:cursor-pointer"
+                onClick={handleSignout}
+              >
+                Log out
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

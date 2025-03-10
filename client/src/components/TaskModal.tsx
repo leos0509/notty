@@ -1,4 +1,4 @@
-import { Task, TaskStatus, useTaskStore } from "@/store/useTaskStore";
+import { MappedTaskStatus, Task, TaskStatus, useTaskStore } from "@/store/useTaskStore";
 import React, { useState } from "react";
 
 const TaskModal = () => {
@@ -7,7 +7,7 @@ const TaskModal = () => {
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<TaskStatus>(TaskStatus.IN_PROGRESS);
   const { addTask } = useTaskStore();
-  
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!title || !dueDate) {
@@ -31,10 +31,11 @@ const TaskModal = () => {
       title,
       dueDate,
       description,
-      status: TaskStatus.IN_PROGRESS,
+      status: MappedTaskStatus[status],
       isPinned: false,
       isChecked: false,
     };
+
     addTask(newTask);
     setTitle("");
     setDueDate("");
@@ -81,11 +82,11 @@ const TaskModal = () => {
               <select
                 className="w-full min-w-48 rounded-md bg-gray-100 p-2 transition-all duration-100 ease-in-out hover:bg-gray-200 focus:ring-1 focus:ring-gray-500 focus:outline-none"
                 value={status}
-                onChange={(e) => setStatus(e.target.value as TaskStatus)}
+                onChange={(e) => e.target.value && setStatus(e.target.value as TaskStatus)}
               >
-                {Object.values(TaskStatus).map((status) => (
-                  <option key={status} value={status}>
-                    {status}
+                {Object.values(TaskStatus).map((statusValue) => (
+                  <option key={statusValue} value={statusValue}>
+                    {statusValue}
                   </option>
                 ))}
               </select>

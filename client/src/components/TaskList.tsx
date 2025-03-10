@@ -2,20 +2,22 @@
 import { useTaskStore } from "@/store/useTaskStore";
 import { useEffect, useState } from "react";
 import TaskCard from "./TaskCard";
+import useUserStore from "@/store/userStore";
 
 const TaskList = () => {
   const { tasks, fetchTask } = useTaskStore();
+  const { isAuthenticated } = useUserStore();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const uid = localStorage.getItem("userId");
-    console.log("Current userId:", uid);
     const loadTasks = async () => {
       await fetchTask();
-      setLoading(false);
     };
 
-    loadTasks();
+    if (!isAuthenticated) {
+      loadTasks();
+    }
+    setLoading(false);
   }, [fetchTask]);
 
   if (loading) {
