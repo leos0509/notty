@@ -12,7 +12,7 @@ interface UserStore {
   userId: number | null;
   token: string | null;
   isAuthenticated: boolean;
-  setUser: (user: User) => void;
+  setUser: (user: User | null) => void;
   setIsAuthenticated: (isAuthenticated: boolean) => void;
   setToken: (token: string) => void;
   signout: () => void;
