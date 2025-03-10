@@ -18,7 +18,7 @@ interface UserStore {
   signout: () => void;
 }
 
-const useUserStore = create<UserStore>((set, get) => ({
+const useUserStore = create<UserStore>((set) => ({
   user: null,
   userId: null,
   token: null,

@@ -23,7 +23,7 @@ export default function Home() {
 
     verifyAuth();
     setLoading(false);
-  }, [router]);
+  }, [router, setIsAuthenticated, setUser]);
 
   if (loading) {
     return <Loading />;

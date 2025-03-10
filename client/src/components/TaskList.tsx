@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useTaskStore } from "@/store/useTaskStore";
 import { useEffect, useState } from "react";
 import TaskCard from "./TaskCard";
@@ -11,14 +11,14 @@ const TaskList = () => {
 
   useEffect(() => {
     const loadTasks = async () => {
-      await fetchTask();
+      if (isAuthenticated) {
+        await fetchTask();
+      }
+      setLoading(false);
     };
 
-    if (!isAuthenticated) {
-      loadTasks();
-    }
-    setLoading(false);
-  }, [fetchTask]);
+    loadTasks();
+  }, [fetchTask, isAuthenticated]);
 
   if (loading) {
     return (
@@ -26,7 +26,7 @@ const TaskList = () => {
         <div>
           <h1 className="text-lg font-bold">Task List</h1>
         </div>
-        <div className="flex w-full gap-2 justify-center items-center h-34">
+        <div className="flex h-34 w-full items-center justify-center gap-2">
           <h1 className="text-lg font-semibold">Loading...</h1>
         </div>
       </div>
@@ -34,20 +34,20 @@ const TaskList = () => {
   }
 
   return (
-    <div className="flex w-full flex-col items-start gap-2 h-full">
+    <div className="flex h-full w-full flex-col items-start gap-2">
       <div>
         <h1 className="text-lg font-bold">Task List</h1>
       </div>
       <div className="flex w-full flex-col gap-2">
         <div className="flex w-full flex-col items-center justify-between gap-2">
           {tasks.length === 0 ? (
-            <div className="flex w-full gap-2 justify-center items-center h-34">
-            <h1 className="text-lg font-semibold">No task found. Create one ...</h1>
-          </div>
+            <div className="flex h-34 w-full items-center justify-center gap-2">
+              <h1 className="text-lg font-semibold">
+                No task found. Create one ...
+              </h1>
+            </div>
           ) : (
-            tasks.map((task, index) => (
-              <TaskCard key={index} task={task} />
-            ))
+            tasks.map((task) => <TaskCard key={task.id} task={task} />)
           )}
         </div>
       </div>

@@ -11,6 +11,6 @@ export const checkAuth = async (): Promise<any> => {
     });
     return { isAuthenticated: true, user: res.data.user };
   } catch (error) {
-    return { isAuthenticated: false, user: null };
+    return { message: error, isAuthenticated: false, user: null };
   }
 };
