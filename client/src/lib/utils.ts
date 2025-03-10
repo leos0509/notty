@@ -1,8 +1,9 @@
+import { User } from "@/store/userStore";
 import axios from "axios";
 
 interface AuthResponse {
   isAuthenticated: boolean;
-  user: any | null;
+  user: User | null;
 }
 
 export const checkAuth = async (): Promise<AuthResponse> => {
