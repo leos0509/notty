@@ -29,7 +29,7 @@ const SigninPage = () => {
         setToken(response.data.token);
         router.push("/");
       }
-    } catch (error: any) {
+    } catch {
       setError("Invalid email or password.");
     } finally {
       setLoading(false);

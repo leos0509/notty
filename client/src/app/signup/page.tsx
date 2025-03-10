@@ -20,18 +20,21 @@ const SignupPage = () => {
     setError("");
 
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}auth/signup`, {
-        name: userName,
-        email,
-        password,
-      });
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}auth/signup`,
+        {
+          name: userName,
+          email,
+          password,
+        },
+      );
 
       if (response.data.token) {
         setUser(response.data.newUser);
         setToken(response.data.token);
         router.push("/");
       }
-    } catch (err) {
+    } catch {
       setError("Signup failed. Please try again.");
     } finally {
       setLoading(false);
@@ -41,7 +44,7 @@ const SignupPage = () => {
   return (
     <div className="bg-background flex h-full min-h-screen w-full flex-col items-center justify-center px-8 py-16">
       <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-lg">
-        <h2 className="text-center text-2xl font-bold font-mono">Sign Up</h2>
+        <h2 className="text-center font-mono text-2xl font-bold">Sign Up</h2>
 
         {error && <p className="mt-2 text-center text-red-500">{error}</p>}
 
@@ -50,7 +53,7 @@ const SignupPage = () => {
           <input
             type="text"
             placeholder="Username"
-            className="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-1 focus:ring-gray-800"
+            className="w-full rounded-lg border px-4 py-2 focus:ring-1 focus:ring-gray-800 focus:outline-none"
             value={userName}
             onChange={(e) => setUserName(e.target.value)}
             required
@@ -60,7 +63,7 @@ const SignupPage = () => {
           <input
             type="email"
             placeholder="Email"
-            className="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-1 focus:ring-gray-800"
+            className="w-full rounded-lg border px-4 py-2 focus:ring-1 focus:ring-gray-800 focus:outline-none"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -70,7 +73,7 @@ const SignupPage = () => {
           <input
             type="password"
             placeholder="Password"
-            className="w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-1 focus:ring-gray-800"
+            className="w-full rounded-lg border px-4 py-2 focus:ring-1 focus:ring-gray-800 focus:outline-none"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required

@@ -1,6 +1,11 @@
 import axios from "axios";
 
-export const checkAuth = async (): Promise<any> => {
+interface AuthResponse {
+  isAuthenticated: boolean;
+  user: any | null;
+}
+
+export const checkAuth = async (): Promise<AuthResponse> => {
   try {
     const res = await axios({
       method: "GET",
@@ -10,7 +15,7 @@ export const checkAuth = async (): Promise<any> => {
       },
     });
     return { isAuthenticated: true, user: res.data.user };
-  } catch (error) {
-    return { message: error, isAuthenticated: false, user: null };
+  } catch {
+    return { isAuthenticated: false, user: null };
   }
 };
